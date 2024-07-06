@@ -1,5 +1,9 @@
 # Gateway (Client Gateway)
 
+## Description
+
+Gateway que permite la comunicación entre el cliente y backend.
+
 ## Dev
 
 1. Clonar el repositorio
