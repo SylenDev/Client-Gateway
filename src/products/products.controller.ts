@@ -6,6 +6,7 @@ import {
   Get,
   Inject,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -14,6 +15,8 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { PaginationDto } from 'src/common';
 import { PRODUCT_SERVICE } from 'src/config';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -22,8 +25,8 @@ export class ProductsController {
   ) {}
 
   @Post()
-  create() {
-    return 'This action adds a new product';
+  create(@Body() createProductDto: CreateProductDto) {
+    return this.productClient.send({ cmd: 'create_product' }, createProductDto);
   }
 
   @Get()
@@ -32,7 +35,7 @@ export class ProductsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     try {
       return await firstValueFrom(
         this.productClient.send({ cmd: 'find_one_product' }, { id }),
@@ -44,11 +47,14 @@ export class ProductsController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return `This action removes a #${id} product`;
+    return this.productClient.send({ cmd: 'delete_product' }, { id });
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() body: any) {
-    return `This action updates a #${id} product`;
+  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+    return this.productClient.send(
+      { cmd: 'update_product' },
+      { id, ...updateProductDto },
+    );
   }
 }
